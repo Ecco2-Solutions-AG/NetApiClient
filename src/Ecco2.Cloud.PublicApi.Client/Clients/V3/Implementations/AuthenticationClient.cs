@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -7,14 +6,19 @@ using System.Threading.Tasks;
 
 namespace Ecco2.Cloud.PublicApi.Client.V3;
 
-internal class AuthenticationClient
+internal class AuthenticationClient: ApiClientBase
 {
-    public async Task<JwtToken> AuthenticateAsync(Ecco2ClientConfiguration clientConfiguration, CancellationToken cancellationToken)
-    {
-        using var client = new HttpClient();
-        client.BaseAddress = new Uri($"{clientConfiguration.BaseAddress.TrimEnd('/')}/authentication/");
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DataBrokerClient "/> class.
+    /// </summary>
+    public AuthenticationClient(ApiClientConfiguration clientConfiguration) : base(clientConfiguration) { }
 
-        var response = await client.PostAsJsonAsync("token", new
+
+    public async Task<JwtToken> AuthenticateAsync(ApiClientConfiguration clientConfiguration, CancellationToken cancellationToken)
+    {
+        HttpClient.BaseAddress = new Uri($"{clientConfiguration.AuthBaseAddress.TrimEnd('/')}/auth/");
+
+        var response = await HttpClient.PostAsJsonAsync("token", new
         {
             clientId = clientConfiguration.ClientId,
             clientSecret = clientConfiguration.ClientSecret

@@ -9,15 +9,8 @@ namespace Ecco2.Cloud.PublicApi.Client.V3;
 /// <summary>
 /// Provides methods to access the Ecco2 DataBroker via the Ecco2 public API
 /// </summary>
-public interface IDataBrokerClient
+public interface IDataBrokerClient: IApiClient
 {
-    /// <summary>
-    /// Authenticates the client.
-    /// </summary>
-    /// <param name="cancellationToken">A <see cref="CancellationToken" /> to observe while waiting for the task to complete.</param>
-    /// <returns>The JWT token.</returns>
-    Task<JwtToken> AuthenticateAsync(CancellationToken cancellationToken = default);
-
     /// <summary>
     /// Requests the process point stored at the specified identifier.
     /// </summary>

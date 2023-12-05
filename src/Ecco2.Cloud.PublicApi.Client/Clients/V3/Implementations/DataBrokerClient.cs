@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Threading;
@@ -13,30 +12,25 @@ namespace Ecco2.Cloud.PublicApi.Client.V3;
 /// <summary>
 /// Provides methods to access the Ecco2 DataBroker via the Ecco2 public API
 /// </summary>
-internal class DataBrokerClient: IDataBrokerClient
+internal class DataBrokerClient: ApiClientBase, IDataBrokerClient
 {
-    private readonly Ecco2ClientConfiguration _clientConfiguration;
-    private readonly HttpClient _httpClient;
-
-    
     /// <summary>
     /// Initializes a new instance of the <see cref="DataBrokerClient "/> class.
     /// </summary>
-    public DataBrokerClient(Ecco2ClientConfiguration clientConfiguration)
+    public DataBrokerClient(ApiClientConfiguration clientConfiguration) : base(clientConfiguration)
     {
-        _clientConfiguration = clientConfiguration;
-
-        // the base address must have a trailing '/' in order to be recognized correctly
-        _httpClient = new HttpClient { BaseAddress = new Uri($"{clientConfiguration.BaseAddress.TrimEnd('/')}/broker/") };
+        HttpClient.BaseAddress = new Uri($"{clientConfiguration.DataBaseAddress.TrimEnd('/')}/broker/");
     }
 
+
+    
     /// <summary>
     /// Authenticates the client.
     /// </summary>
-    public async Task<JwtToken> AuthenticateAsync(CancellationToken cancellationToken = default)
+    public virtual async Task<JwtToken> AuthenticateAsync(CancellationToken cancellationToken = default)
     {
-        var token = await new AuthenticationClient().AuthenticateAsync(_clientConfiguration, cancellationToken);
-        _httpClient.DefaultRequestHeaders.Add("Authorization", $"{token.TokenType} {token.Token}");
+        var token = await new AuthenticationClient(ClientConfiguration).AuthenticateAsync(ClientConfiguration, cancellationToken);
+        HttpClient.DefaultRequestHeaders.Add("Authorization", $"{token.TokenType} {token.Token}");
 
         return token;
     }
@@ -48,7 +42,7 @@ internal class DataBrokerClient: IDataBrokerClient
     {
         if (identifier == Guid.Empty) { throw new ArgumentException("Identifier must be specified"); }
 
-        var response = await _httpClient.GetAsync($"process-points/{identifier:D}", cancellationToken);
+        var response = await HttpClient.GetAsync($"process-points/{identifier:D}", cancellationToken);
         response.EnsureSuccessStatusCode();
         
         return await response.Content.ReadFromJsonAsync<ProcessPoint>(cancellationToken: cancellationToken, options: new JsonSerializerOptions());        
@@ -61,7 +55,7 @@ internal class DataBrokerClient: IDataBrokerClient
     {
         if (identifiers is null) { throw new ArgumentNullException(nameof(identifiers)); }
 
-        var response = await _httpClient.PostAsJsonAsync("process-points/get-range", identifiers.Where(i => i != Guid.Empty), cancellationToken);
+        var response = await HttpClient.PostAsJsonAsync("process-points/get-range", identifiers.Where(i => i != Guid.Empty), cancellationToken);
         response.EnsureSuccessStatusCode();
         
         return await response.Content.ReadFromJsonAsync<ProcessPoint[]>(cancellationToken: cancellationToken, options: new JsonSerializerOptions());        
@@ -70,10 +64,23 @@ internal class DataBrokerClient: IDataBrokerClient
     /// <summary>
     /// Publishes the specified process point on the broker.
     /// </summary>
-    public async Task PublishAsync(ProcessPoint processPoint, CancellationToken cancellationToken = default) { throw new NotImplementedException(); }
+    public async Task PublishAsync(ProcessPoint processPoint, CancellationToken cancellationToken = default)
+    {
+        if (processPoint is null) { throw new ArgumentNullException(nameof(processPoint)); }
+        if (String.IsNullOrEmpty(processPoint.Identifier)) { throw new ArgumentException("Identifier cannot be null"); }
+
+        var response = await HttpClient.PutAsJsonAsync("process-points", processPoint, cancellationToken);
+        response.EnsureSuccessStatusCode();
+    }
 
     /// <summary>
     /// Publishes the specified process points on the broker.
     /// </summary>
-    public async Task PublishAsync(IEnumerable<ProcessPoint> processPoints, CancellationToken cancellationToken = default) { throw new NotImplementedException(); }
+    public async Task PublishAsync(IEnumerable<ProcessPoint> processPoints, CancellationToken cancellationToken = default)
+    {
+        if (processPoints is null) { throw new ArgumentNullException(nameof(processPoints)); }
+
+        var response = await HttpClient.PutAsJsonAsync("process-points/put-range", processPoints.Where(p => !String.IsNullOrEmpty(p.Identifier)), cancellationToken);
+        response.EnsureSuccessStatusCode();
+    }
 }
