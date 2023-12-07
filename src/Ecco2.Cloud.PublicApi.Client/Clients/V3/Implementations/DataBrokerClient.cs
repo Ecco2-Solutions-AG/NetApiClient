@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Json;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -42,10 +41,10 @@ internal class DataBrokerClient: ApiClientBase, IDataBrokerClient
     {
         if (identifier == Guid.Empty) { throw new ArgumentException("Identifier must be specified"); }
 
-        var response = await HttpClient.GetAsync($"process-points/{identifier:D}", cancellationToken);
+        var response = await HttpClient.GetAsync($"measurements/{identifier:D}", cancellationToken);
         response.EnsureSuccessStatusCode();
         
-        return await response.Content.ReadFromJsonAsync<ProcessPoint>(cancellationToken: cancellationToken, options: new JsonSerializerOptions());        
+        return await response.Content.ReadFromJsonAsync<ProcessPoint>(SerializationOptions.PerformanceWithStringEnum, cancellationToken);
     }
 
     /// <summary>
@@ -55,10 +54,10 @@ internal class DataBrokerClient: ApiClientBase, IDataBrokerClient
     {
         if (identifiers is null) { throw new ArgumentNullException(nameof(identifiers)); }
 
-        var response = await HttpClient.PostAsJsonAsync("process-points/get-range", identifiers.Where(i => i != Guid.Empty), cancellationToken);
+        var response = await HttpClient.PostAsJsonAsync("measurements/get-range", identifiers.Where(i => i != Guid.Empty), cancellationToken);
         response.EnsureSuccessStatusCode();
         
-        return await response.Content.ReadFromJsonAsync<ProcessPoint[]>(cancellationToken: cancellationToken, options: new JsonSerializerOptions());        
+        return await response.Content.ReadFromJsonAsync<ProcessPoint[]>(SerializationOptions.PerformanceWithStringEnum, cancellationToken);
     }
 
     /// <summary>
@@ -69,7 +68,7 @@ internal class DataBrokerClient: ApiClientBase, IDataBrokerClient
         if (processPoint is null) { throw new ArgumentNullException(nameof(processPoint)); }
         if (String.IsNullOrEmpty(processPoint.Identifier)) { throw new ArgumentException("Identifier cannot be null"); }
 
-        var response = await HttpClient.PutAsJsonAsync("process-points", processPoint, cancellationToken);
+        var response = await HttpClient.PutAsJsonAsync("measurements", processPoint, SerializationOptions.PerformanceWithStringEnum, cancellationToken);
         response.EnsureSuccessStatusCode();
     }
 
@@ -80,7 +79,7 @@ internal class DataBrokerClient: ApiClientBase, IDataBrokerClient
     {
         if (processPoints is null) { throw new ArgumentNullException(nameof(processPoints)); }
 
-        var response = await HttpClient.PutAsJsonAsync("process-points/put-range", processPoints.Where(p => !String.IsNullOrEmpty(p.Identifier)), cancellationToken);
+        var response = await HttpClient.PutAsJsonAsync("measurements/put-range", processPoints.Where(p => !String.IsNullOrEmpty(p.Identifier)), SerializationOptions.PerformanceWithStringEnum, cancellationToken);
         response.EnsureSuccessStatusCode();
     }
 }

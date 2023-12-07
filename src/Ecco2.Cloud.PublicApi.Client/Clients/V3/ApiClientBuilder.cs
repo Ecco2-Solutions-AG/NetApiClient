@@ -62,8 +62,9 @@ public sealed class ApiClientBuilder
     {
         if (!IsValidBuilt()) { throw new InvalidOperationException("Builder state is not valid. Make sure you set all required configurations before building a client."); }
 
-        if (typeof(T) == typeof(IDataBrokerClient)) { return new DataBrokerClient(_config) as T; }
-        if (typeof(T) == typeof(IHistorianClient)) { return new HistorianClient(_config) as T; }
+        var type = typeof(T);
+        if (type == typeof(IDataBrokerClient)) { return new DataBrokerClient(_config) as T; }
+        if (type == typeof(IHistorianClient)) { return new HistorianClient(_config) as T; }
 
         throw new ArgumentException("Specified API client is not supported by this builder"); 
     }

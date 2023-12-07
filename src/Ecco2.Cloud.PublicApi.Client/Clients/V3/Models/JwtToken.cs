@@ -6,12 +6,6 @@ namespace Ecco2.Cloud.PublicApi.Client.V3;
 public class JwtToken
 {
     /// <summary>
-    /// The client ID linked to the token.
-    /// </summary>
-    [JsonPropertyName("clientId")]
-    public string ClientId { get; set; }
-
-    /// <summary>
     /// The authentication token to be used by the client for calls to the end points of the Ecco2 API.
     /// </summary>
     /// <remarks>

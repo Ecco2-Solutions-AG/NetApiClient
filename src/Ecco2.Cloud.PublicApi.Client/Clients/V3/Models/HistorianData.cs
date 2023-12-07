@@ -9,6 +9,7 @@ public class HistorianData
     /// <summary>
     /// The globally unique identifier of the measurement
     /// </summary>
+    [JsonPropertyName("id")]
     public string Identifier { get; set; }
 
     /// <summary>
