@@ -13,6 +13,15 @@ public interface IHistorianClient: IApiClient
     /// <summary>
     /// Gets the time series for the specified measurement, period of interest, and resolution
     /// </summary>
+    /// <param name="identifier">The globally unique identifier of the measurement</param>
+    /// <param name="request">The data request object</param>
+    /// <param name="cancellationToken">A <see cref="CancellationToken" /> to observe while waiting for the task to complete.</param>
+    /// <returns>A collection of time series grouped by channel name; empty collection if none found</returns>
+    Task<HistorianData[]> GetSeriesAsync(string identifier, HistorianRequest request, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Gets the time series for the specified measurement, period of interest, and resolution
+    /// </summary>
     /// <param name="projectIdentifier">The globally unique identifier of the installation site</param>
     /// <param name="channelCode">The measurement channel's code</param>
     /// <param name="request">The data request object</param>
