@@ -32,22 +32,12 @@ public sealed class ApiClientBuilder
     /// <param name="baseAddress">The base address to use.</param>
     public void WithDataBaseAddress(string baseAddress)
     {
-        if (!String.IsNullOrEmpty(baseAddress)) { _config.DataBaseAddress = baseAddress; }
-    }
-
-    /// <summary>
-    /// Uses the specified base address instead of the default one.
-    /// </summary>
-    /// <param name="baseAddress">The base address to use.</param>
-    public void WithAuthBaseAddress(string baseAddress)
-    {
-        if (!String.IsNullOrEmpty(baseAddress)) { _config.AuthBaseAddress = baseAddress; }
+        if (!String.IsNullOrEmpty(baseAddress)) { _config.BaseAddress = baseAddress; }
     }
     
     /// <summary>
     /// Custom configuration for the <seealso cref="HttpMessageHandler"/> that is going to be used by the API client
     /// </summary>
-    /// <remarks>This handler is going to be used for auth end data endpoints.</remarks>
     public void WithConfigureMessageHandler(Func<HttpMessageHandler, HttpMessageHandler> handler)
     {
         _config.ConfigureMessageHandler = handler;
@@ -68,6 +58,7 @@ public sealed class ApiClientBuilder
 
         throw new ArgumentException("Specified API client is not supported by this builder"); 
     }
+
 
 
     //

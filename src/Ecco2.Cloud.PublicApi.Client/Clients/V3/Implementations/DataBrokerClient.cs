@@ -18,21 +18,10 @@ internal class DataBrokerClient: ApiClientBase, IDataBrokerClient
     /// </summary>
     public DataBrokerClient(ApiClientConfiguration clientConfiguration) : base(clientConfiguration)
     {
-        HttpClient.BaseAddress = new Uri($"{clientConfiguration.DataBaseAddress.TrimEnd('/')}/broker/");
+        HttpClient.BaseAddress = new Uri($"{clientConfiguration.BaseAddress.TrimEnd('/')}/broker/");
     }
 
 
-    
-    /// <summary>
-    /// Authenticates the client.
-    /// </summary>
-    public virtual async Task<JwtToken> AuthenticateAsync(CancellationToken cancellationToken = default)
-    {
-        var token = await new AuthenticationClient(ClientConfiguration).AuthenticateAsync(ClientConfiguration, cancellationToken);
-        HttpClient.DefaultRequestHeaders.Add("Authorization", $"{token.TokenType} {token.Token}");
-
-        return token;
-    }
     
     /// <summary>
     /// Requests the process point stored at the specified identifier.
@@ -57,7 +46,7 @@ internal class DataBrokerClient: ApiClientBase, IDataBrokerClient
         var response = await HttpClient.PostAsJsonAsync("measurements/get-range", identifiers.Where(i => i != Guid.Empty), cancellationToken);
         response.EnsureSuccessStatusCode();
         
-        return await response.Content.ReadFromJsonAsync<ProcessPoint[]>(SerializationOptions.PerformanceWithStringEnum, cancellationToken);
+        return await response.Content.ReadFromJsonAsync<ProcessPoint[]>(SerializationOptions.PerformanceWithStringEnum, cancellationToken) ?? Array.Empty<ProcessPoint>();
     }
 
     /// <summary>
@@ -68,7 +57,7 @@ internal class DataBrokerClient: ApiClientBase, IDataBrokerClient
         if (processPoint is null) { throw new ArgumentNullException(nameof(processPoint)); }
         if (String.IsNullOrEmpty(processPoint.Identifier)) { throw new ArgumentException("Identifier cannot be null"); }
 
-        var response = await HttpClient.PutAsJsonAsync("measurements", processPoint, SerializationOptions.PerformanceWithStringEnum, cancellationToken);
+        var response = await HttpClient.PutAsJsonAsync("measurements", new[] { processPoint }, SerializationOptions.PerformanceWithStringEnum, cancellationToken);
         response.EnsureSuccessStatusCode();
     }
 
@@ -79,7 +68,7 @@ internal class DataBrokerClient: ApiClientBase, IDataBrokerClient
     {
         if (processPoints is null) { throw new ArgumentNullException(nameof(processPoints)); }
 
-        var response = await HttpClient.PutAsJsonAsync("measurements/put-range", processPoints.Where(p => !String.IsNullOrEmpty(p.Identifier)), SerializationOptions.PerformanceWithStringEnum, cancellationToken);
+        var response = await HttpClient.PutAsJsonAsync("measurements", processPoints.Where(p => !String.IsNullOrEmpty(p.Identifier)), SerializationOptions.PerformanceWithStringEnum, cancellationToken);
         response.EnsureSuccessStatusCode();
     }
 }

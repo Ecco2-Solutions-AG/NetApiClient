@@ -16,7 +16,7 @@ public interface IDataBrokerClient: IApiClient
     /// </summary>
     /// <param name="identifier">The globally unique identifier of the process point to query.</param>
     /// <param name="cancellationToken">A <see cref="CancellationToken" /> to observe while waiting for the task to complete.</param>
-    /// <returns>The process point as requested.</returns>
+    /// <returns>The process point as requested; <c>null</c> if none found.</returns>
     Task<ProcessPoint> GetAsync(Guid identifier, CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -24,7 +24,7 @@ public interface IDataBrokerClient: IApiClient
     /// </summary>
     /// <param name="identifiers">The globally unique identifier of the process points to query.</param>
     /// <param name="cancellationToken">A <see cref="CancellationToken" /> to observe while waiting for the task to complete.</param>
-    /// <returns>The process point as requested.</returns>
+    /// <returns>The process point as requested; empty collection if none found.</returns>
     /// <remarks>This endpoint fails if the access to any of the specified entries is unauthorized.</remarks>
     Task<ProcessPoint[]> GetAsync(IEnumerable<Guid> identifiers, CancellationToken cancellationToken = default);
 
@@ -40,5 +40,6 @@ public interface IDataBrokerClient: IApiClient
     /// </summary>
     /// <param name="processPoints">The process points to publish</param>
     /// <param name="cancellationToken">A <see cref="CancellationToken" /> to observe while waiting for the task to complete.</param>
+    /// <remarks>This endpoint fails if the access to any of the specified entries is unauthorized.</remarks>
     Task PublishAsync(IEnumerable<ProcessPoint> processPoints, CancellationToken cancellationToken = default);
 }

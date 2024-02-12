@@ -53,4 +53,25 @@ public static class DataBrokerClientExtensions
 
         AsyncHelper.RunSync(() => c.PublishAsync(processPoints));
     }
+
+    /// <summary>
+    /// Publishes the specified value on the specified address on the broker.
+    /// </summary>
+    /// <param name="identifier">The globally unique identifier of the process point to write to.</param>
+    /// <param name="value">The value to write.</param>
+    /// <remarks>
+    /// The quality is set to <see cref="Quality.GoodNonSpecific"/> and the timestamp to <see cref="DateTime.UtcNow"/>
+    /// </remarks>
+    public static void PublishAsync(this IDataBrokerClient c, Guid identifier, double value)
+    {
+        if (identifier == Guid.Empty) { throw new ArgumentException("Identifier cannot be null"); }
+
+        AsyncHelper.RunSync(() => c.PublishAsync(new ProcessPoint
+        {
+            Identifier = identifier.ToString("D"),
+            Value = value,
+            Quality = Quality.GoodNonSpecific,
+            TimeStamp = DateTime.UtcNow
+        }));
+    }
 }
