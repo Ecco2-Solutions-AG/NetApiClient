@@ -17,20 +17,10 @@ internal class HistorianClient: ApiClientBase, IHistorianClient
     /// </summary>
     public HistorianClient(ApiClientConfiguration clientConfiguration) : base(clientConfiguration)
     {
-        HttpClient.BaseAddress = new Uri($"{clientConfiguration.DataBaseAddress.TrimEnd('/')}/historian/measurements/");
+        HttpClient.BaseAddress = new Uri($"{clientConfiguration.BaseAddress.TrimEnd('/')}/historian/measurements/");
     }
+    
 
-
-    /// <summary>
-    /// Authenticates the client.
-    /// </summary>
-    public async Task<JwtToken> AuthenticateAsync(CancellationToken cancellationToken = default)
-    {
-        var token = await new AuthenticationClient(ClientConfiguration).AuthenticateAsync(ClientConfiguration, cancellationToken);
-        HttpClient.DefaultRequestHeaders.Add("Authorization", $"{token.TokenType} {token.Token}");
-
-        return token;
-    }
 
     /// <summary>
     /// Gets the time series for the specified measurement, period of interest, and resolution
@@ -59,7 +49,7 @@ internal class HistorianClient: ApiClientBase, IHistorianClient
         var response = await HttpClient.GetAsync($"series?projectIdentifier={projectIdentifier}&channelName={channelCode}&{request.ToQueryString()}", cancellationToken);
         response.EnsureSuccessStatusCode();
         
-        return await response.Content.ReadFromJsonAsync<Dictionary<string, HistorianData[]>>(SerializationOptions.PerformanceWithStringEnum, cancellationToken);
+        return await response.Content.ReadFromJsonAsync<Dictionary<string, HistorianData[]>>(SerializationOptions.PerformanceWithStringEnum, cancellationToken) ?? new Dictionary<string, HistorianData[]>();
     }
 
     /// <summary>
@@ -75,6 +65,6 @@ internal class HistorianClient: ApiClientBase, IHistorianClient
         var response = await HttpClient.GetAsync($"series?projectIdentifier={projectIdentifier}&elementIdentifier={elementIdentifier}&channelName={channelCode}&{request.ToQueryString()}", cancellationToken);
         response.EnsureSuccessStatusCode();
         
-        return await response.Content.ReadFromJsonAsync<Dictionary<string, HistorianData[]>>(SerializationOptions.PerformanceWithStringEnum, cancellationToken);        
+        return await response.Content.ReadFromJsonAsync<Dictionary<string, HistorianData[]>>(SerializationOptions.PerformanceWithStringEnum, cancellationToken) ?? new Dictionary<string, HistorianData[]>();        
     }
 }
