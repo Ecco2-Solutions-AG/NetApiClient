@@ -24,6 +24,6 @@ public class HistorianRequest
 	/// The aggregation interval to apply.
     /// Falls back to the server's defaults if not specified.
 	/// </summary>
-    [JsonPropertyName("interval")]
-	public AggregationInterval AggregationInterval { get; set; }
+    [JsonPropertyName("interval"), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	public AggregationInterval? AggregationInterval { get; set; }
 }

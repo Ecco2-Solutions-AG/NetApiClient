@@ -13,7 +13,7 @@ public class ProcessPoint
 	/// The agreed-upon, globally unique identifier of the process point.
 	/// </summary>
 	[JsonPropertyName("id")]
-	public string Identifier { get; set; }
+	public Guid Identifier { get; set; }
 
 	/// <summary>
 	/// The value of the process point.
