@@ -12,6 +12,12 @@ namespace Ecco2.Cloud.PublicApi.Client.V3;
 public interface IDataBrokerClient: IApiClient
 {
     /// <summary>
+    /// Authenticates the client.
+    /// </summary>
+    /// <param name="cancellationToken">A <see cref="CancellationToken" /> to observe while waiting for the task to complete.</param>
+    Task AuthenticateAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Requests the process point stored at the specified identifier.
     /// </summary>
     /// <param name="identifier">The globally unique identifier of the process point to query.</param>

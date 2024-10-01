@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net.Http.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Ecco2.Cloud.PublicApi.Client.V3.Entities;
 
 
 namespace Ecco2.Cloud.PublicApi.Client.V3;
@@ -13,9 +14,6 @@ namespace Ecco2.Cloud.PublicApi.Client.V3;
 /// </summary>
 internal class DataBrokerClient: ApiClientBase, IDataBrokerClient
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="DataBrokerClient "/> class.
-    /// </summary>
     public DataBrokerClient(ApiClientConfiguration clientConfiguration) : base(clientConfiguration)
     {
         HttpClient.BaseAddress = new Uri($"{clientConfiguration.BaseAddress.TrimEnd('/')}/broker/");
@@ -55,7 +53,7 @@ internal class DataBrokerClient: ApiClientBase, IDataBrokerClient
     public async Task PublishAsync(ProcessPoint processPoint, CancellationToken cancellationToken = default)
     {
         if (processPoint is null) { throw new ArgumentNullException(nameof(processPoint)); }
-        if (String.IsNullOrEmpty(processPoint.Identifier)) { throw new ArgumentException("Identifier cannot be null"); }
+        if (processPoint.Identifier == Guid.Empty) { throw new ArgumentException("Identifier cannot be null"); }
 
         var response = await HttpClient.PutAsJsonAsync("measurements", new[] { processPoint }, SerializationOptions.PerformanceWithStringEnum, cancellationToken);
         response.EnsureSuccessStatusCode();
@@ -68,7 +66,7 @@ internal class DataBrokerClient: ApiClientBase, IDataBrokerClient
     {
         if (processPoints is null) { throw new ArgumentNullException(nameof(processPoints)); }
 
-        var response = await HttpClient.PutAsJsonAsync("measurements", processPoints.Where(p => !String.IsNullOrEmpty(p.Identifier)), SerializationOptions.PerformanceWithStringEnum, cancellationToken);
+        var response = await HttpClient.PutAsJsonAsync("measurements", processPoints.Where(p => p.Identifier != Guid.Empty), SerializationOptions.PerformanceWithStringEnum, cancellationToken);
         response.EnsureSuccessStatusCode();
     }
 }

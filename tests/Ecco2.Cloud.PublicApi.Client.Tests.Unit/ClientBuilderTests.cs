@@ -1,7 +1,4 @@
-﻿using Ecco2.Cloud.PublicApi.Client.V3;
-
-
-namespace Ecco2.Cloud.PublicApi.Client.Tests.Unit;
+﻿namespace Ecco2.Cloud.PublicApi.Client.Tests.Unit;
 
 public class ClientBuilderTests
 {

@@ -2,9 +2,9 @@
 using System.Net.Http;
 
 
-namespace Ecco2.Cloud.PublicApi.Client.V3;
+namespace Ecco2.Cloud.PublicApi.Client.V3.Entities;
 
-public class ApiClientConfiguration
+internal class ApiClientConfiguration
 {
     /// <summary>
     /// The base address to use when connecting to the endpoints of the public API.

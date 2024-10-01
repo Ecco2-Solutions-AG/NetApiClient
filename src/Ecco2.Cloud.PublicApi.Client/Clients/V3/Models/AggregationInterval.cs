@@ -16,7 +16,7 @@ public enum AggregationInterval
     P1D = 3,
 
     /// <summary>
-    /// 1 month interval
+    /// 1-month interval
     /// </summary>
     P1M = 4,
 

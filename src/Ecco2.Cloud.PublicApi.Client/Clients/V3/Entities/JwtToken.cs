@@ -1,9 +1,9 @@
 ﻿using System.Text.Json.Serialization;
 
 
-namespace Ecco2.Cloud.PublicApi.Client.V3;
+namespace Ecco2.Cloud.PublicApi.Client.V3.Entities;
 
-public class JwtToken
+internal class JwtToken
 {
     /// <summary>
     /// The authentication token to be used by the client for calls to the end points of the Ecco2 API.

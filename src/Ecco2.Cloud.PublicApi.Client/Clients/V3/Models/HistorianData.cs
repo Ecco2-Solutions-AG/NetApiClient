@@ -1,16 +1,18 @@
 ﻿using System;
 using System.Text.Json.Serialization;
 
-
 namespace Ecco2.Cloud.PublicApi.Client.V3;
 
+/// <summary>
+/// Represents a data point stored as a time series
+/// </summary>
 public class HistorianData
 {
     /// <summary>
     /// The globally unique identifier of the measurement
     /// </summary>
     [JsonPropertyName("id")]
-    public string Identifier { get; set; }
+    public Guid Identifier { get; set; }
 
     /// <summary>
     /// The value of the process point.

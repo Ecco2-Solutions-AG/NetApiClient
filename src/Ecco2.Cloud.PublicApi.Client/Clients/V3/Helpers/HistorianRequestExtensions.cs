@@ -12,7 +12,7 @@ internal static class HistorianRequestExtensions
         {
             request.From is null ? null : $"from={request.From.Value:O}",
             request.To is null ? null : $"to={request.To.Value:O}",
-            $"interval={request.AggregationInterval:G}",
+            request.AggregationInterval is null ? null : $"interval={request.AggregationInterval.Value:G}",
         }.Where(q => q is not null));
     }
 }

@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Linq;
 using System.Net.Http;
+using Ecco2.Cloud.PublicApi.Client.V3.Entities;
 
 
 namespace Ecco2.Cloud.PublicApi.Client.V3;
@@ -20,27 +22,36 @@ public sealed class ApiClientBuilder
     /// </summary>
     /// <param name="clientId">The client ID as provided by Ecco2</param>
     /// <param name="clientSecret">Secret of the client. Its value is initially provided by Ecco2 together with the client ID. It may have been updated by the third party since.</param>
-    public void WithCredentials(string clientId, string clientSecret)
+    /// <returns>The reference to the <see cref="ApiClientBuilder"/> for command chaining.</returns>
+    public ApiClientBuilder WithCredentials(string clientId, string clientSecret)
     {
         _config.ClientId = clientId;
         _config.ClientSecret = clientSecret;
+        
+        return this;
     }
 
     /// <summary>
     /// Uses the specified base address instead of the default one.
     /// </summary>
     /// <param name="baseAddress">The base address to use.</param>
-    public void WithDataBaseAddress(string baseAddress)
+    /// <returns>The reference to the <see cref="ApiClientBuilder"/> for command chaining.</returns>
+    public ApiClientBuilder WithDataBaseAddress(string baseAddress)
     {
         if (!String.IsNullOrEmpty(baseAddress)) { _config.BaseAddress = baseAddress; }
+
+        return this;
     }
     
     /// <summary>
     /// Custom configuration for the <seealso cref="HttpMessageHandler"/> that is going to be used by the API client
     /// </summary>
-    public void WithConfigureMessageHandler(Func<HttpMessageHandler, HttpMessageHandler> handler)
+    /// <returns>The reference to the <see cref="ApiClientBuilder"/> for command chaining.</returns>
+    public ApiClientBuilder WithConfigureMessageHandler(Func<HttpMessageHandler, HttpMessageHandler> handler)
     {
         _config.ConfigureMessageHandler = handler;
+
+        return this;
     }
 
     /// <summary>
@@ -52,11 +63,13 @@ public sealed class ApiClientBuilder
     {
         if (!IsValidBuilt()) { throw new InvalidOperationException("Builder state is not valid. Make sure you set all required configurations before building a client."); }
 
-        var type = typeof(T);
-        if (type == typeof(IDataBrokerClient)) { return new DataBrokerClient(_config) as T; }
-        if (type == typeof(IHistorianClient)) { return new HistorianClient(_config) as T; }
+        var iType = typeof(T);
+        var implementor = this.GetType().Assembly.GetTypes().FirstOrDefault(t => !t.IsNested && !t.IsAbstract && t.GetInterfaces().Contains(iType));
 
-        throw new ArgumentException("Specified API client is not supported by this builder"); 
+        if (implementor is null) { throw new ArgumentException("Specified API client is not supported by this builder"); }
+        if (Activator.CreateInstance(implementor, _config) is not T ci) { throw new ArgumentException("Specified API client is not supported by this builder"); }
+
+        return ci;
     }
 
 

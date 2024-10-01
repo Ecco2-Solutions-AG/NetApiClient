@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Ecco2.Cloud.PublicApi.Client.V3.Entities;
 
 
 namespace Ecco2.Cloud.PublicApi.Client.V3;
